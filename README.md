@@ -10,28 +10,79 @@
    > npm i antd redux react-redux react-router-dom@6 axios less less-loader@6.0.0 --save
 3. 引入 antd 样式
    > @import 'antd/dist/antd.css';
-4. 在 pages 中创建路由文件:
+4. 针对 antd 按需打包 npm add react-app-rewired customize-cra babel-plugin-import
+   ```
+      const {override, fixBabelImports} = require('customize-cra')
+      module.exports = override(
+         fixBabelImports('import', {
+            libraryName: 'antd',
+            libraryDirectory: 'es',
+            style: 'css' // 自动打包相关的样式
+         })
+      )
+   ```
+   新建 config-overrides.js 文件，后吧 package.json 文件中的 scripts 修改为
+   ```
+      "scripts": {
+         "start": "react-app-rewired start",
+         "build": "react-app-rewired build",
+         "test": "react-app-rewired test",
+         "eject": "react-app-rewired eject"
+      },
+   ```
+   react-app-rewired 这个会加载 config-overrides.js 配置文件
+5. 在 pages 中创建路由文件:
    加入 router 配置后，把 index.js 中的 app 改为 router 下路径
-5. 创建 router 文件夹:
+6. 创建 router 文件夹:
    1. router 内置组件： BrowserRouter、HashRouter、Route、Redirect、link、NavLink、Swith
    2. ```
-      import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
-      <Router>
-         <Routes>
-            <Route path="/" element={<App />}>
-            <Route path="/" element={<Home />}></Route>
-            <Route path="/list" element={<List />}></Route>
-            </Route>
-            <Route path="/login" element={<Login />}></Route>
-         </Routes>
-      </Router>
+         import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
+         <Router>
+            <Routes>
+               <Route path="/" element={<App />}>
+               <Route path="/" element={<Home />}></Route>
+               <Route path="/list" element={<List />}></Route>
+               </Route>
+               <Route path="/login" element={<Login />}></Route>
+            </Routes>
+         </Router>
       ```
       > > 目前对于路径 / 对应不同的 element 还有些疑问 -- 怎么配置默认的显示页面
    3. 输出的地方为<Outlet />
-6. 配置 less
+7. 配置 less
+
    1. 先用 npm run eject 吧项目配置文件暴露出来
    2. 在文件 webpack.config.js 中搜索 sassModuleRegex，找出最后的位置下面添加 less 配置.把 sass 的配置文件复制一份
-7. 封装 Request 请求
+   3. 另一种配置方案也是本网站使用的是把 config-overrides.js 配置文件改为
+
+   ```
+       const {
+         override,
+         fixBabelImports,
+         addLessLoader,
+         adjustStyleLoaders,
+       } = require('customize-cra')
+
+       module.exports = override(
+         fixBabelImports('import', {
+             libraryName: 'antd',
+             libraryDirectory: 'es',
+             style: true, // 自动打包相关的样式
+         }),
+         addLessLoader({
+             lessOptions: {
+               javascriptEnabled: true,
+               localIdentName: '[local]--[hash:base64:5]',
+             },
+         }),
+         adjustStyleLoaders(({ use: [, , postcss] }) => {
+             const postcssOptions = postcss.options
+             postcss.options = { postcssOptions }
+         })
+       )
+   ```
+
+8. 封装 Request 请求
 
    1. request.js
 
@@ -73,27 +124,34 @@
 
    由于 eject 后出现 vscode 提示错误问题，所以解决办法是找到 node_modules 下面的 babel-preset-react-app 下的 creat.js 在 render 前面添加`var env = process.env.BABEL_ENV || process.env.NODE_ENV || 'development'`重启解决问题
 
-8. 解决跨域
+9. 解决跨域
    在文件 webpackDevServer.config.js 配置 proxy
 
    ```
-   proxy: {
-      '/api': {
-         target: 'http://47.93.114.103:6688/manage',
-         changeOrigin: true, // 是否跨域
-         pathRewrite: { '^/api': '/' },
-      },
-   },
+      proxy: {
+         '/api': {
+            target: 'http://47.93.114.103:6688/manage',
+            changeOrigin: true, // 是否跨域
+            pathRewrite: { '^/api': '/' },
+         },
+      }
    ```
 
    后在文件 request.js 中把 baseURL 改为 /api
 
-9. 安装 server，npm install -g serve
+10. 安装 server，npm install -g serve
 
 ## 过程遇到的问题
 
 1. 引入 router 文件的时候不能显示文件，后查找出原因为 const BaseRouter = () => ()最后的（）写成了{}.因为要写标签所以要用()而不是{}
-2.
+2. 配置 config-overrides.js 是一直报错，后来添加了一段代码后解决
+   ```
+      adjustStyleLoaders(({ use: [, , postcss] }) => {
+         const postcssOptions = postcss.options
+         postcss.options = { postcssOptions }
+      })
+   ```
+3.
 
 # MD 语法
 

@@ -3,7 +3,7 @@ import { Form, Input, Button, Checkbox, message } from 'antd'
 import { UserOutlined, LockOutlined } from '@ant-design/icons'
 import { Link, useNavigate } from 'react-router-dom'
 import '../../less/Login.less'
-import { LoginApi } from '../../request/api'
+import { LoginApi } from '../../api/api'
 
 export default function Login() {
   const navigate = useNavigate()

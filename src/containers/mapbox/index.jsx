@@ -32,10 +32,15 @@ export default function Mapbox() {
           type="radio"
           name="rtoggle"
           value="satellite"
-          checked="checked"
         />
         <label for="satellite-v9">satellite</label>
-        <input id="light-v10" type="radio" name="rtoggle" value="light" />
+        <input
+          id="light-v10"
+          type="radio"
+          name="rtoggle"
+          value="light"
+          defaultChecked="checked"
+        />
         <label for="light-v10">light</label>
         <input id="dark-v10" type="radio" name="rtoggle" value="dark" />
         <label for="dark-v10">dark</label>
